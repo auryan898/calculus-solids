@@ -185,7 +185,7 @@ def solid_revolution(lower_limit,upper_limit,precision,offset,lower_func,upper_f
 
     row_num = len(verts)/l
     # Now to generate all faces (unless 'wireframe') "Think clockwise"
-    faces = [ ( ((i)%2*2+i)*l+x,((i)%2*2+i)*l+x+1,((i+1)%2*2+i)*l+x+1,((i+1)%2*2+i)*l+x ) for i in range(row_num-2) for x in range(int(l-1)]
+    faces = [ ( ((i)%2*2+i)*l+x,((i)%2*2+i)*l+x+1,((i+1)%2*2+i)*l+x+1,((i+1)%2*2+i)*l+x ) for i in range(row_num-2) for x in range(int(l-1))]
     # Generate extra faces for the ends in case of "pie"
     faces.append([ x for x in range(l) ][::-1]+[ x+l for x in range(l)[::1] ])
     faces.append([ x+(row_num-1)*l for x in range(l) ][::-1]+[ x+(row_num-2)*l for x in range(l)[::1] ])
