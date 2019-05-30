@@ -17,8 +17,8 @@
 
 <p>Pick the file types you want:</p>
   <input type="checkbox" name="formats" value="stl" checked="checked">STL File for importing to 3D Modelling Software<br>
-  <input type="checkbox" name="formats" value="plot">3D plotted points (slowest file to be generated, affects loading time)<br>
-  <input type="checkbox" name="formats" value="jscad" checked="checked">OpenJsCAD file for convenient viewing on <a href="https://openjscad.org" target="_blank">openjscad.org</a><br>
+  <input type="checkbox" name="formats" value="plot" checked="checked">3D plotted points<br>
+  <input type="checkbox" name="formats" value="jscad">OpenJsCAD file for convenient viewing on <a href="https://openjscad.org" target="_blank">openjscad.org</a><br>
   <input type="checkbox" name="formats" value="scad">OpenSCAD file for usage in OpenSCAD modelling software<br>
 
   <hr/>
@@ -54,6 +54,7 @@
 $(document).ready(function(){
   var names = ['lower_limit','upper_limit','precision','offset'];
   var textnames = ['lower_func','upper_func'];
+
   for ( let name of names) {
     let val = $('input[name='+name+']').val();
     let local = localStorage.getItem(name);
@@ -68,6 +69,16 @@ $(document).ready(function(){
     $('textarea[name="'+name+'"]').val(local ? local : val);
   }
 
+  var tf_checked = $('input[name="formats"]')
+  for (var i = 0; i<tf_checked.length; i++ ){
+
+    let name = tf_checked[i].value
+    let bool = tf_checked[i].checked
+    let empty = localStorage.getItem("format_"+name) == null;
+    let local = localStorage.getItem("format_"+name) =='true'; // FILL IN
+    tf_checked[i].checked = !empty ? local : bool;
+    console.log("t/f checked",local);
+  }
   
   $('form').on('submit',function(e){
     for ( let name of names) {
@@ -79,6 +90,11 @@ $(document).ready(function(){
       let val = $('textarea[name="'+name+'"]').val();
       console.log(val);
       localStorage.setItem(name,val);
+    }
+    for (let el of tf_checked ){
+      let name = el.value
+      let bool = el.checked
+      let local = localStorage.setItem("format_"+name,bool) // FILL IN
     }
   });
 });

@@ -10,5 +10,9 @@
         <p class="">{{k}}  <a href="/uploads/{{ v }}" target="_blank">{{v}}</a></p>
     </div>
     {% endfor %}
+    <div id="stl_viewer" style="width:400px;height:500px;margin:0 auto; border: 1px solid black"></div>
+    <script>
+    var stl_viewer=new StlViewer(document.getElementById("stl_viewer"), { models: [ {id:0, filename:"/uploads/generated_solid.stl"} ] });
+    </script>
 </span>
 {% endblock %}

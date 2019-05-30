@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='Calculus Solids of Known Volume',
-    version='0.3dev',
+    version='0.4dev',
     packages=['calculus_solids','calculus_solids.web'],
     package_data = {
         'calculus_solids.web': ['static/*','templates/*'],

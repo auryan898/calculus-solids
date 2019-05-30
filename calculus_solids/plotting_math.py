@@ -43,7 +43,7 @@ def cross_semicircle(lower_limit,upper_limit,precision,lower_func,upper_func,wir
             verts += [ (abs(g(x*step)[0]),x*step,g(x*step)[1]) for x in r ]
 
     l = len(r)
-    row_num = len(verts)/len(r)
+    row_num = int(len(verts)/len(r))
     #row_num = 9
     if wireframe and not debug: 
         pairs = [ (i,i+1) for i in range(int(row_num-1))] + [(row_num-1,0)]
@@ -153,12 +153,12 @@ def cross_triangle(lower_limit,upper_limit,precision,lower_func,upper_func,wiref
 def solid_revolution(lower_limit,upper_limit,precision,offset,lower_func,upper_func,wireframe=False,pie=False, debug=False,x_axis=False,invert=False):
     def f(x):
         try:
-            return lower_func(x)+offset
+            return lower_func(x)-offset
         except:
             return 0
     def g(x):
         try:
-            return upper_func(x)+offset
+            return upper_func(x)-offset
         except:
             return 0
     def axis(x):
@@ -183,9 +183,9 @@ def solid_revolution(lower_limit,upper_limit,precision,offset,lower_func,upper_f
     radrange = range(1,int(angle/angle_precision)+2)
     verts += [ [z*math.cos(rad*angle_precision+start_angle),y,z*math.sin(rad*angle_precision+start_angle)] for rad in radrange for x,y,z in verts ]
 
-    row_num = len(verts)/l
+    row_num = int(len(verts)/l)
     # Now to generate all faces (unless 'wireframe') "Think clockwise"
-    faces = [ ( ((i)%2*2+i)*l+x,((i)%2*2+i)*l+x+1,((i+1)%2*2+i)*l+x+1,((i+1)%2*2+i)*l+x ) for i in range(row_num-2) for x in range(int(l-1))]
+    faces = [ ( ((i)%2*2+i)*l+x,((i)%2*2+i)*l+x+1,((i+1)%2*2+i)*l+x+1,((i+1)%2*2+i)*l+x ) for i in range((row_num-2)) for x in range(int(l-1))]
     # Generate extra faces for the ends in case of "pie"
     faces.append([ x for x in range(l) ][::-1]+[ x+l for x in range(l)[::1] ])
     faces.append([ x+(row_num-1)*l for x in range(l) ][::-1]+[ x+(row_num-2)*l for x in range(l)[::1] ])
