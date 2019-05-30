@@ -1,5 +1,21 @@
+.base-grid {
+    display: grid;
+    grid-template-columns: 2;
+    grid-template-rows: 3;
+    width:400px;
+}
+.base-grid span:nth-child(2n) {
+    grid-column:2;
+}
+.base-grid span:nth-child(n+1):nth-child(2-n) {
+    grid-row:1;
+}
+.base-grid span:nth-child(n+3):nth-child(4-n) {
+    grid-row:2;
+}
+
 .med_wide {
-    width:200px;
+    width:150px;
     display: block; 
 }
 
@@ -26,6 +42,12 @@ body {
 }
 @media only screen and (max-width: 450px){
     .card {
-        width: 100%;
+        width: 90%;
+    }
+    .lg_wide {
+        width:90%;
+    }
+    .base-grid span:nth-child(2n) {
+        grid-column:unset;
     }
 }

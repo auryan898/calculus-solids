@@ -21,7 +21,17 @@
                     Plotly.newPlot(
                         'bf6e7797-4826-4646-b3aa-91377ac2038a',
                         [{"marker": {"line": {"color": "rgba(217,217,217,0.14)", "width": 0.5}, "opacity": 0.8, "size": 5}, "mode": "markers", "type": "scatter3d", "uid": "201a4581-81a0-4386-be4a-c14648708090", "x": {{x}}, "y": {{y}}, "z": {{z}}}],
-                        {},
+                        {
+                            title: {
+                                text:'{{title}}',
+                                font: {
+                                family: 'Courier New, monospace',
+                                size: 24
+                                },
+                                xref: 'paper',
+                                x: 0.05,
+                            },
+                            },
                         {"responsive": true, "plotlyServerURL": "https://plot.ly", "linkText": "Export to plot.ly", "showLink": false}
                     )
                 };

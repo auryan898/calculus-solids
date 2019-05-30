@@ -251,7 +251,7 @@ function create_solid(){
         f.write(text)
     return name+".jscad"
 
-def mesh_plotly(verts,name="new_mesh"):
+def mesh_plotly(verts,name="new_mesh",title="New Mesh"):
     # import plotly.offline as py
     # import plotly.graph_objs as go
     verts = [list((round(x,2),round(y,2),round(z,2))) for x,y,z in verts ]
@@ -270,6 +270,7 @@ def mesh_plotly(verts,name="new_mesh"):
     src = src.replace('{{x}}',str(list(x)))
     src = src.replace('{{y}}',str(list(y)))
     src = src.replace('{{z}}',str(list(z)))
+    src = src.replace('{{title}}',str(title))
     with open(name+'.html','w') as f:
         f.write(src)
     return name+'.html'

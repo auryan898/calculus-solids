@@ -10,7 +10,7 @@
 <p>Pick a Type of Solid to Create:</p>
   <select name="solid_type">
     <option value="solid_revolution">Solid of Revolution</option>
-    <option value="cross_triangle">Solid with Triangule Cross Sections</option>
+    <option value="cross_triangle">Solid with Triangle Cross Sections</option>
     <option value="cross_square">Solid with Square Cross Sections</option>
     <option value="cross_semicircle">Solid with Semicircle Cross Sections</option>
   </select>
@@ -22,6 +22,13 @@
   <input type="checkbox" name="formats" value="scad">OpenSCAD file for usage in OpenSCAD modelling software<br>
 
   <hr/>
+  <span class="card" style="display:block;">
+    <b>extra options: (experimental)</b><br>
+    <input type="checkbox" name="extra_options" value="wireframe">wireframe (not sure what happens)
+    <input type="checkbox" name="extra_options" value="invert">invert (fixes inside-out)
+    <input type="checkbox" name="extra_options" value="debug">basic form (reduced form)
+  </span>
+
   {% set textparams =  [
     ('Lower Limit','lower_limit','-3.0'),
     ('Upper Limit','upper_limit','3.0'),
@@ -32,13 +39,22 @@
       ('Lower Function','lower_func','0'),
       ('Upper Function','upper_func','math.sqrt(9-x**2)'),
     ] %}
-  {% for param in textparams %}
-  <span id="form_{{param[1]}}">
-    <label class="med_wide" for="{{param[1]}}">{{param[0]}}</label>
-    <input class="med_wide" type="text" name="{{param[1]}}" value="{{param[2]}}">
-    <br/>
-  </span>
-  {% endfor %}
+
+  <div class="base-grid">
+    {% for param in textparams %}
+    <span id="form_{{param[1]}}">
+      <label class="med_wide" for="{{param[1]}}">{{param[0]}}</label>
+      <input class="med_wide" type="text" name="{{param[1]}}" value="{{param[2]}}">
+      {% if loop.index != 0 and loop.index%2==0 %}
+        <style>
+          #form_{{param[1]}} {
+            float: right;
+          }
+        </style>
+      {% endif %}
+    </span>
+    {% endfor %}
+  </div>
   {% for param in areaparams %}
   <span id="form_{{param[1]}}">
     <label class="lg_wide" for="{{param[1]}}">{{param[0]}}</label>
@@ -55,18 +71,21 @@ $(document).ready(function(){
   var names = ['lower_limit','upper_limit','precision','offset'];
   var textnames = ['lower_func','upper_func'];
 
+  let localSolidType = localStorage.getItem('solid_type');
+  if (localSolidType != null) $("select[name='solid_type']").val(localSolidType);
+
   for ( let name of names) {
     let val = $('input[name='+name+']').val();
     let local = localStorage.getItem(name);
     console.log(local);
-    $('input[name="'+name+'"]').val(local ? local : val);
+    $('input[name="'+name+'"]').val(local != null ? local : val);
   }
 
   for ( let name of textnames) {
     let val = $('input[name='+name+']').val();
     let local = localStorage.getItem(name);
     console.log(local);
-    $('textarea[name="'+name+'"]').val(local ? local : val);
+    $('textarea[name="'+name+'"]').val(local != null ? local : val);
   }
 
   var tf_checked = $('input[name="formats"]')
@@ -96,6 +115,8 @@ $(document).ready(function(){
       let bool = el.checked
       let local = localStorage.setItem("format_"+name,bool) // FILL IN
     }
+    let valSolidType = $("select[name='solid_type']").val();
+    localStorage.setItem('solid_type',valSolidType);
   });
 });
 
