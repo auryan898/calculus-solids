@@ -2,10 +2,10 @@ from setuptools import setup
 
 setup(
     name='Calculus Solids of Known Volume',
-    version='0.4dev',
+    version='0.5dev',
     packages=['calculus_solids','calculus_solids.web'],
     package_data = {
-        'calculus_solids.web': ['static/*','templates/*'],
+        'calculus_solids.web': ['static/*','static/**/*','templates/*'],
         'calculus_solids':['plotly_template.html']
     },
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
