@@ -1,0 +1,31 @@
+.med_wide {
+    width:200px;
+    display: block; 
+}
+
+.lg_wide {
+    width:400px;
+    display: block; 
+}
+body {
+    width: 100%;
+}
+.card {
+    width: 50%;
+    padding: 10px 10px 10px 10px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+@media only screen and (max-width: 800px){
+    .card {
+        width: 400px;
+    }
+}
+@media only screen and (max-width: 450px){
+    .card {
+        width: 100%;
+    }
+}

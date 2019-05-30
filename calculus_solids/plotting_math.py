@@ -1,7 +1,10 @@
 import math
+import pkgutil
 
-def cross_semicircle(lower,upper,step,f1,f2,wireframe=False,debug=False,invert=False):
-    a,b = lower,upper
+def cross_semicircle(lower_limit,upper_limit,precision,lower_func,upper_func,wireframe=False,debug=False,invert=False):
+    a,b = lower_limit,upper_limit
+    step = precision
+    f1, f2 = upper_func, lower_func
     def l1(x):
         try:
             return f1(x)
@@ -59,8 +62,9 @@ def cross_semicircle(lower,upper,step,f1,f2,wireframe=False,debug=False,invert=F
         faces = [ list(t)[::-1] for t in faces]
     return verts,edges,faces
 
-def cross_square(lower,upper,step,lower_func,upper_func,height_scale=1,wireframe=False,debug=False,invert=False):
-    a,b = lower,upper
+def cross_square(lower_limit,upper_limit,precision,lower_func,upper_func,height_scale=1,wireframe=False,debug=False,invert=False):
+    a,b = lower_limit,upper_limit
+    step = precision
     def l1(x):
         try:
             return upper_func(x)
@@ -104,8 +108,9 @@ def cross_square(lower,upper,step,lower_func,upper_func,height_scale=1,wireframe
         faces = [ list(t)[::-1] for t in faces]
     return verts,edges,faces
 
-def cross_triangle(lower,upper,step,lower_func,upper_func,wireframe=False,debug=False,invert=False):
-    a,b = lower,upper
+def cross_triangle(lower_limit,upper_limit,precision,lower_func,upper_func,wireframe=False,debug=False,invert=False):
+    a,b = lower_limit,upper_limit
+    step = precision
     def l1(x):
         try:
             return upper_func(x)
@@ -148,12 +153,12 @@ def cross_triangle(lower,upper,step,lower_func,upper_func,wireframe=False,debug=
 def solid_revolution(lower_limit,upper_limit,precision,offset,lower_func,upper_func,wireframe=False,pie=False, debug=False,x_axis=False,invert=False):
     def f(x):
         try:
-            return upper_func(x)+offset
+            return lower_func(x)+offset
         except:
             return 0
     def g(x):
         try:
-            return lower_func(x)+offset
+            return upper_func(x)+offset
         except:
             return 0
     def axis(x):
@@ -209,6 +214,7 @@ def mesh_stl(verts,faces,name="new_mesh"):
 
     # Write the mesh to file "cube.stl"
     cube.save(name+'.stl')
+    return name+'.stl'
 
 def mesh_openscad(verts,faces,name="new_mesh"):
     
@@ -218,6 +224,7 @@ def mesh_openscad(verts,faces,name="new_mesh"):
     with open(name+".scad","w") as f:
         text = "polyhedron(points=%s,faces=%s);" % (str(verts),str(faces))
         f.write(text)
+    return name+".scad"
 
 def mesh_openjscad(verts,faces,name="new_mesh"):
     verts = [list((round(x,2),round(y,2),round(z,2))) for x,y,z in verts ]
@@ -225,35 +232,47 @@ def mesh_openjscad(verts,faces,name="new_mesh"):
     # faces = [list(t) for t in faces]
     with open(name+".jscad","w") as f:
         text = """
-            // title      : Calculus Solids
-            // author     : Ryan B. Au
-            // license    : MIT License
-            // revision   : 1.00
-            // tags       : Calculus BC, Calculus AB,Vertices, Polyhedron
-            // file       : poly.jscad
+// title      : Calculus Solids
+// author     : Ryan B. Au
+// license    : MIT License
+// revision   : 1.00
+// tags       : Calculus BC, Calculus AB,Vertices, Polyhedron
+// file       : poly.jscad
 
-            function main () {
-            let verts = %s;
-            let faces = %s;
-            return polyhedron({points:verts,triangles:faces});
-            }
+function main () {
+    return create_solid();
+}
+function create_solid(){
+    let verts = %s;
+    let faces = %s;
+    return polyhedron({points:verts,triangles:faces});
+}
         """ % (str(verts),str(faces))
         f.write(text)
+    return name+".jscad"
 
 def mesh_plotly(verts,name="new_mesh"):
-    import plotly.offline as py
-    import plotly.graph_objs as go
+    # import plotly.offline as py
+    # import plotly.graph_objs as go
     verts = [list((round(x,2),round(y,2),round(z,2))) for x,y,z in verts ]
     x,y,z = zip(*verts)
 
-    surface = go.Surface(x=x,y=y,z=z)
-    data = [surface]
-    fig = go.Figure(data=data)
+    # surface = go.Surface(x=x,y=y,z=z)
+    # data = [surface]
+    # fig = go.Figure(data=data)
 
     # trace0
-    trace1 = go.Scatter3d(x=x,y=y,z=z,mode='markers',marker=dict(size=5,line=dict(color='rgba(217,217,217,0.14)',width=0.5),opacity=0.8))
-    py.plot([trace1],filename=name+".html",auto_open=False)
-    py.plot(fig,filename=name+"-surface.html",auto_open=False)
+    # trace1 = go.Scatter3d(x=x,y=y,z=z,mode='markers',marker=dict(size=5,line=dict(color='rgba(217,217,217,0.14)',width=0.5),opacity=0.8))
+    # py.plot([trace1],filename=name+".html",auto_open=False)
+    # py.plot(fig,filename=name+"-surface.html",auto_open=False)
+
+    src = pkgutil.get_data( __name__ , 'plotly_template.html')
+    src = src.replace('{{x}}',str(list(x)))
+    src = src.replace('{{y}}',str(list(y)))
+    src = src.replace('{{z}}',str(list(z)))
+    with open(name+'.html','w') as f:
+        f.write(src)
+    return name+'.html'
 
 if __name__=='__main__':
     # import subprocess

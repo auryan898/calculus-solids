@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block header %}
+  {% block title %}
+    Creating/Visualizing Solids of Known Volume
+  {% endblock %}
+{% endblock %}
+
+{% block content %}
+<form action="/create/">
+<p>Pick a Type of Solid to Create:</p>
+  <select name="solid_type">
+    <option value="solid_revolution">Solid of Revolution</option>
+    <option value="cross_triangle">Solid with Triangule Cross Sections</option>
+    <option value="cross_square">Solid with Square Cross Sections</option>
+    <option value="cross_semicircle">Solid with Semicircle Cross Sections</option>
+  </select>
+
+<p>Pick the file types you want:</p>
+  <input type="checkbox" name="formats" value="stl" checked="checked">STL File for importing to 3D Modelling Software<br>
+  <input type="checkbox" name="formats" value="plot">3D plotted points (slowest file to be generated, affects loading time)<br>
+  <input type="checkbox" name="formats" value="jscad" checked="checked">OpenJsCAD file for convenient viewing on <a href="https://openjscad.org" target="_blank">openjscad.org</a><br>
+  <input type="checkbox" name="formats" value="scad">OpenSCAD file for usage in OpenSCAD modelling software<br>
+
+  <hr/>
+  {% set textparams =  [
+    ('Lower Limit','lower_limit','-3.0'),
+    ('Upper Limit','upper_limit','3.0'),
+    ('Precision','precision','0.1'),
+    ('Offset','offset','0'),
+    ] %}
+    {% set areaparams = [
+      ('Lower Function','lower_func','0'),
+      ('Upper Function','upper_func','math.sqrt(9-x**2)'),
+    ] %}
+  {% for param in textparams %}
+  <span id="form_{{param[1]}}">
+    <label class="med_wide" for="{{param[1]}}">{{param[0]}}</label>
+    <input class="med_wide" type="text" name="{{param[1]}}" value="{{param[2]}}">
+    <br/>
+  </span>
+  {% endfor %}
+  {% for param in areaparams %}
+  <span id="form_{{param[1]}}">
+    <label class="lg_wide" for="{{param[1]}}">{{param[0]}}</label>
+    <textarea class="lg_wide" type="text" name="{{param[1]}}" rows="5">{{param[2]}}</textarea>
+    <br/>
+  </span>
+  {% endfor %}
+  <input type="submit">
+  <hr/>
+  {% block created_content %}{% endblock %}
+</form>
+<script>
+$(document).ready(function(){
+  var names = ['lower_limit','upper_limit','precision','offset'];
+  var textnames = ['lower_func','upper_func'];
+  for ( let name of names) {
+    let val = $('input[name='+name+']').val();
+    let local = localStorage.getItem(name);
+    console.log(local);
+    $('input[name="'+name+'"]').val(local ? local : val);
+  }
+
+  for ( let name of textnames) {
+    let val = $('input[name='+name+']').val();
+    let local = localStorage.getItem(name);
+    console.log(local);
+    $('textarea[name="'+name+'"]').val(local ? local : val);
+  }
+
+  
+  $('form').on('submit',function(e){
+    for ( let name of names) {
+      let val = $('input[name="'+name+'"]').val();
+      console.log(val);
+      localStorage.setItem(name,val);
+    }
+    for ( let name of textnames) {
+      let val = $('textarea[name="'+name+'"]').val();
+      console.log(val);
+      localStorage.setItem(name,val);
+    }
+  });
+});
+
+</script>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'home.html' %}
+
+{% block created_content %}
+<p> Here are download links for the generated files. </p>
+</p>Navigate to <br/><b>{{os.getcwd()}}</b><br/> to find the generated files on your system </p>
+<span>
+    {% for k,v,description in filenames %}
+    <div class="card">
+        <p>{{description}}</p>
+        <p class="">{{k}}  <a href="/uploads/{{ v }}" target="_blank">{{v}}</a></p>
+    </div>
+    {% endfor %}
+</span>
+{% endblock %}

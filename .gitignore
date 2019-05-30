@@ -1,0 +1,5 @@
+*.egg-info
+dist
+*.py[cod]
+build
+generated_solid*
