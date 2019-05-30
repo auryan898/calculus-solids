@@ -57,13 +57,15 @@
   </div>
   {% for param in areaparams %}
   <span id="form_{{param[1]}}">
-    <label class="lg_wide" for="{{param[1]}}">{{param[0]}}</label>
-    <textarea class="lg_wide" type="text" name="{{param[1]}}" rows="5">{{param[2]}}</textarea>
+    <label class="lg_wide" for="{{param[1]}}">{{param[0]}} <a href="https://en.wikibooks.org/wiki/Python_Programming/Basic_Math" target="_blank">math reference</a></label>
+    <textarea class="lg_wide" type="text" name="{{param[1]}}" rows="5" placeholder="add your Python math expression here
+    example: math.sqrt(5**2+math.pi)">{{param[2]}} + 0</textarea>
     <br/>
   </span>
   {% endfor %}
   <input type="submit">
   <hr/>
+  <button onclick="localStorage.clear(); window.location('/');">Reset</button>
   {% block created_content %}{% endblock %}
 </form>
 <script>
@@ -85,7 +87,7 @@ $(document).ready(function(){
     let val = $('input[name='+name+']').val();
     let local = localStorage.getItem(name);
     console.log(local);
-    $('textarea[name="'+name+'"]').val(local != null ? local : val);
+    $('textarea[name="'+name+'"]').val(local != undefined ? local : val);
   }
 
   var tf_checked = $('input[name="formats"]')
@@ -96,6 +98,16 @@ $(document).ready(function(){
     let empty = localStorage.getItem("format_"+name) == null;
     let local = localStorage.getItem("format_"+name) =='true'; // FILL IN
     tf_checked[i].checked = !empty ? local : bool;
+    console.log("t/f checked",local);
+  }
+  var extra_options = $('input[name="extra_options"]')
+  for (var i = 0; i<extra_options.length; i++ ){
+
+    let name = extra_options[i].value
+    let bool = extra_options[i].checked
+    let empty = localStorage.getItem("extra_options_"+name) == null;
+    let local = localStorage.getItem("extra_options_"+name) =='true'; // FILL IN
+    extra_options[i].checked = !empty ? local : bool;
     console.log("t/f checked",local);
   }
   
@@ -114,6 +126,11 @@ $(document).ready(function(){
       let name = el.value
       let bool = el.checked
       let local = localStorage.setItem("format_"+name,bool) // FILL IN
+    }
+    for (let el of extra_options ){
+      let name = el.value
+      let bool = el.checked
+      let local = localStorage.setItem("extra_options_"+name,bool) // FILL IN
     }
     let valSolidType = $("select[name='solid_type']").val();
     localStorage.setItem('solid_type',valSolidType);

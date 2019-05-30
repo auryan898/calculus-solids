@@ -25,6 +25,8 @@ def uploaded_file(filename):
 
 @app.route("/create/")
 def create():
+
+    # Adding parameters to function
     stype = request.args.get("solid_type")
     p_list = ["lower_limit","upper_limit","precision","wireframe","debug","invert"]
     if stype=='solid_revolution': 
@@ -32,6 +34,13 @@ def create():
     params = ({k: eval(v) for k, v in request.args.items() if k in p_list})
 
     params.update({ k: eval( "lambda x : {}".format(v) ) for k, v in request.args.items() if k in ["lower_func","upper_func"] })
+    # extra options
+    if 'wireframe' in request.args.getlist("extra_options"):
+        params.update({'wireframe':True})
+    if 'debug' in request.args.getlist("extra_options"):
+        params.update({'debug':True})
+    if 'invert' in request.args.getlist("extra_options"):
+        params.update({'invert':True})
 
     print("Calculating Vertices and Faces...")
     data = None
@@ -53,6 +62,8 @@ def create():
     print("Generating Files...")
     name =  request.args.get('filename')
     name = name if name else 'generated_solid'
+
+    # Generating Files
     context = []
     print(request.args.getlist("formats"))
     isSTL = False
