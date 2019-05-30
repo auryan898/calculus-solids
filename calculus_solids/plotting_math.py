@@ -54,7 +54,7 @@ def cross_semicircle(lower_limit,upper_limit,precision,lower_func,upper_func,wir
     elif not debug:
         pairs = [ (i,i+1) for i in range(int(row_num-1))] + [(row_num-1,0)]
         for v,w in pairs:
-            faces += [ (x+v*l,x+1+v*l,x+1+w*l,x+w*l) for x in range(l-1) ]
+            faces += [ (x+v*l,x+1+v*l,x+1+w*l,x+w*l) for x in range(int(l-1)) ]
         
         faces += [ [ v*(l) for v in range(int(row_num))] ]
         faces += [ [ (l-1)+v*(l) for v in range(int(row_num))][::-1] ]
