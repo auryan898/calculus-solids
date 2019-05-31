@@ -258,8 +258,8 @@ function create_solid(){
     return name+".jscad"
 
 def mesh_plotly(verts,name="new_mesh",title="New Mesh",altverts=None):
-    import plotly.offline as py
-    import plotly.graph_objs as go
+    # import plotly.offline as py
+    # import plotly.graph_objs as go
     verts = [list((round(x,2),round(y,2),round(z,2))) for x,y,z in verts ]
     x,y,z = zip(*verts)
     # traces = []
