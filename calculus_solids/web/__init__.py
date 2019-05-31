@@ -71,7 +71,7 @@ def create():
         context.append(('STL format',mesh_stl(v,f,name=name), 'Download this file and it can be opened in any 3D modelling software' ))
         isSTL=True
     if 'plot' in request.args.getlist("formats"):
-        context.append(('3D Graphed Points',mesh_plotly(v,name=name,title=title), 'Click this link to open a 3D graph of the vertices of the solid' ))
+        context.append(('3D Graphed Points',mesh_plotly(v,name=name,title=title,altverts=e), 'Click this link to open a 3D graph of the vertices of the solid' ))
     if 'jscad' in request.args.getlist("formats"):
         context.append(('OpenJsCAD',mesh_openjscad(v,f,name=name), 'Download this file and go to openjscad.org.  Drag the downloaded file to the website and click "autoreload" to get an automatically updating display of the solid' ))
     if 'scad' in request.args.getlist("formats"):
