@@ -1,6 +1,9 @@
 import math
 import pkgutil
 
+import numpy as np
+from stl import mesh
+
 def cross_semicircle(lower_limit,upper_limit,precision,lower_func,upper_func,wireframe=False,debug=False,invert=False):
     a,b = lower_limit,upper_limit
     step = precision
@@ -202,8 +205,7 @@ def solid_revolution(lower_limit,upper_limit,precision,offset,lower_func,upper_f
     return verts,altverts,faces
 
 def mesh_stl(verts,faces,name="new_mesh"):
-    import numpy as np
-    from stl import mesh
+    
     verts = [list((round(x,2),round(y,2),round(z,2))) for x,y,z in verts ]
     faces0 = [ [t[0], t[i], t[i+1]][::-1] for t in faces for i in range(1,len(t)-1)]
 
