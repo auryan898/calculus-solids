@@ -9,7 +9,7 @@ try:
 except:
     exit(1)
 if main("show Calculus-Solids-of-Known-Volume".split()) == 1:
-    main('install https://github.com/auryan898/calculus-solids/archive/master.zip --user'.split())
+    main('install --upgrade https://github.com/auryan898/calculus-solids/archive/master.zip --user'.split())
 
 from calculus_solids import web
 web.start()
