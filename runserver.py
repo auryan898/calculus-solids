@@ -1,10 +1,10 @@
-import pip
+
 try:
-    import pip._internal
-    install = None
     try:
+        import pip
         main = pip.main
     except:
+        import pip._internal
         main = pip._internal.main
 except:
     exit(1)
