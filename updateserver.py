@@ -10,5 +10,5 @@ except:
 if True or main("show Calculus-Solids-of-Known-Volume".split()) == 1:
     main('install --upgrade https://github.com/auryan898/calculus-solids/archive/master.zip --user'.split())
 
-from calculus_solids import web
-web.start()
+# from calculus_solids import web
+# web.start()
