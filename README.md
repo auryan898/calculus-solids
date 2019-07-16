@@ -2,7 +2,7 @@
 
 ### Purpose
 
-Do a quick search on "solids of known volume" to find visualizations for them, and you'll find fancy animations and colorful designs that offer a lot in terms of learning, but what abotu function?
+Do a quick search on "solids of known volume" to find visualizations for them, and you'll find fancy animations and colorful designs that offer a lot in terms of learning, but what about function?
 
 This tool gives a concise, simple representation for solids of known volume for use in 3D modeling software and simple visualization tools.  It's great for teachers and students in calculus to better understand these solids, in and out.
 
