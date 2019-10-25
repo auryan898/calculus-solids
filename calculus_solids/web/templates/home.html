@@ -24,16 +24,19 @@
   <hr/>
   <span class="card" style="display:block;">
     <b>extra options: (experimental)</b><br>
-    <input type="checkbox" name="extra_options" value="wireframe">wireframe (not sure what happens)
-    <input type="checkbox" name="extra_options" value="invert">invert (fixes inside-out)
-    <input type="checkbox" name="extra_options" value="debug">basic form (reduced form)
+    <input type="checkbox" name="extra_options" value="pie">cut into model (solids of revolution)
+    <input type="checkbox" name="extra_options" value="invert">invert (fixes inside-out, or when invisible)
+    <br/>
+    <input type="checkbox" name="extra_options" value="wireframe">wireframe (not sure what happens, might make it disappear)
+    <br/>
+    <input type="checkbox" name="extra_options" value="debug">basic form (reduced form, might make it disappear)
   </span>
-
+  <!-- ('Offset','offset','0'), -->
+  
   {% set textparams =  [
     ('Lower Limit','lower_limit','-3.0'),
     ('Upper Limit','upper_limit','3.0'),
     ('Precision','precision','0.1'),
-    ('Offset','offset','0'),
     ] %}
     {% set areaparams = [
       ('Lower Function','lower_func','0'),
@@ -57,9 +60,9 @@
   </div>
   {% for param in areaparams %}
   <span id="form_{{param[1]}}">
-    <label class="lg_wide" for="{{param[1]}}">{{param[0]}} <a href="https://en.wikibooks.org/wiki/Python_Programming/Basic_Math" target="_blank">math reference</a></label>
-    <textarea class="lg_wide" type="text" name="{{param[1]}}" rows="5" placeholder="add your Python math expression here
-    example: math.sqrt(5**2+math.pi)">{{param[2]}} + 0</textarea>
+    <label class="lg_wide" for="{{param[1]}}">{{param[0]}} </label>
+    <textarea class="lg_wide" type="text" name="{{param[1]}}" id="{{param[1]}}_" rows="5" placeholder="add your Python math expression here
+    example: sqrt(5**2+pi)">{{param[2]}} + 0</textarea>
     <br/>
   </span>
   {% endfor %}
@@ -68,6 +71,11 @@
   <button onclick="localStorage.clear(); window.location('/');">Reset</button>
   {% block created_content %}{% endblock %}
 </form>
+<style>
+#form_offset {
+  visibility:hidden;
+}
+</style>
 <script>
 $(document).ready(function(){
   var names = ['lower_limit','upper_limit','precision','offset'];

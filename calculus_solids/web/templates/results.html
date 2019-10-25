@@ -7,14 +7,14 @@
     {% for k,v,description in filenames %}
     <div class="card">
         <p>{{description}}</p>
-        <p class="">{{k}}  <a href="/uploads/{{ v }}" target="_blank">{{v}}</a></p>
+        <p class="">{{k}}  <a href="{{ v }}" target="_blank">(generated file)</a></p>
     </div>
     {% endfor %}
 
     {% if isSTLformat %}
         <div id="stl_viewer" style="width:80%;height:250px;margin:0 auto; border: 1px solid black"></div>
         <script>
-        var stl_viewer = stl_viewer = new StlViewer(document.getElementById("stl_viewer"), { models: [ {id:0, filename:"/uploads/generated_solid.stl"} ] });
+        var stl_viewer = stl_viewer = new StlViewer(document.getElementById("stl_viewer"), { models: [ {id:0, filename: "{{the_filename}}.stl"} ] });
         </script>
     {% endif %}
 </span>

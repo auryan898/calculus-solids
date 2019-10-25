@@ -3,47 +3,84 @@ import pkgutil
 
 import numpy as np
 from stl import mesh
+from .math_parse import discrete_points_generator
+
+def create_any_solid(stype,params):
+    data,title = None,None
+    if stype == 'solid_revolution':
+        data = solid_revolution(**params)
+        title = 'Solid of Revolution'
+    elif stype == 'cross_semicircle':
+        data = cross_semicircle(**params)
+        title = 'Solid with Semicircle Cross Sections'
+    elif stype == 'cross_triangle':
+        data = cross_triangle(**params)
+        title = 'Solid with Triangle Cross Sections'
+    elif stype == 'cross_square':
+        data = cross_square(**params)
+        title = 'Solid with Square Cross Sections'
+    return (data,title)
 
 def cross_semicircle(lower_limit,upper_limit,precision,lower_func,upper_func,wireframe=False,debug=False,invert=False):
+    invert = not invert
     a,b = lower_limit,upper_limit
     step = precision
-    f1, f2 = upper_func, lower_func
-    def l1(x):
-        try:
-            return f1(x)
-        except:
-            return None
-    def l2(x):
-        try:
-            return f2(x)
-        except:
-            return None
-    def l3(rad):
-        def result(v):
-            try:
-                diameter = f1(v)-f2(v)
-                radius = diameter/2.
-                x = radius*math.cos(rad)
-                y = radius*math.sin(rad) + f2(v) + radius
-                return (x,y)
-            except:
-                return (0,0)
-        return result
+    # f1, f2 = upper_func, lower_func # OLD
+    # def l1(x):
+    #     try:
+    #         return f1(x)
+    #     except:
+    #         return None
+    # def l2(x):
+    #     try:
+    #         return f2(x)
+    #     except:
+    #         return None
+    # def l3(rad):
+    #     def result(v):
+    #         try:
+    #             diameter = f1(v)-f2(v)
+    #             radius = diameter/2.
+    #             x = radius*math.cos(rad)
+    #             y = radius*math.sin(rad) + f2(v) + radius
+    #             return (x,y)
+    #         except:
+    #             return (0,0)
+    #     return result
     
+    y1,y2,xvalues = discrete_points_generator(lower_func,upper_func,start=a,end=b,interval=step,mirror_axis=False) # NEW
     # Create mesh
-    r = range(int(a/step),int((b)/step)+1)
-    r = [ x for x in r if l1(x*step) is not None and l2(x*step) is not None and l1(x*step)<=l2(x*step) ]
+    # r = range(int(a/step),int((b)/step)+1) # OLD
+    # r = [ x for x in r if l1(x*step) is not None and l2(x*step) is not None and l1(x*step)<=l2(x*step) ] #OLD
+    r = xvalues # NEW
 
     radrange = range(-int(math.pi/2/0.1),int(math.pi/2/0.1)+1)
     verts,edges,faces = [],[],[]
     
-    verts += [ (0,x*step,l1(x*step)) for x in r]
-    verts += [ (0,x*step,l2(x*step)) for x in r]
+    # verts += [ (0,x*step,l1(x*step)) for x in r] # OLD
+    # verts += [ (0,x*step,l2(x*step)) for x in r]
+    points = list(zip(xvalues,y2)) + (list(zip(xvalues,y1))) # NEW
+    verts = [ (0,x,y) for x,y in points ]
+    radius_sets = zip(xvalues,y1,y2)
+    def calculate_angle_point(bottom,top,rad):
+        try:
+            radius = abs(top-bottom)/2.0
+            return (radius*math.cos(rad), radius*math.sin(rad) + bottom + radius)
+        except:
+            return (0,0)
+
+    for rad in radrange:
+        angle = rad*0.1
+        for x,bottom,top in radius_sets:
+            newx,newy = calculate_angle_point(bottom,top,angle)
+            verts.append( (abs(newx),x,newy) )
+            
+
     #if not debug:
-    if True:
-        for rad in radrange:
-            g = l3(rad*0.1)
-            verts += [ (abs(g(x*step)[0]),x*step,g(x*step)[1]) for x in r ]
+    # if True: # OLD
+    #     for rad in radrange:
+    #         g = l3(rad*0.1)
+    #         verts += [ (abs(g(x*step)[0]),x*step,g(x*step)[1]) for x in r ]
 
     l = len(r)
     row_num = int(len(verts)/len(r))
@@ -68,32 +105,40 @@ def cross_semicircle(lower_limit,upper_limit,precision,lower_func,upper_func,wir
 def cross_square(lower_limit,upper_limit,precision,lower_func,upper_func,height_scale=1,wireframe=False,debug=False,invert=False):
     a,b = lower_limit,upper_limit
     step = precision
-    def l1(x):
-        try:
-            return upper_func(x)
-        except:
-            return None
-    def l2(x):
-        try:
-            return lower_func(x)
-        except:
-            return None
-    def l3(x):
-        try:
-            return lower_func(x)-upper_func(x)
-        except:
-            return None
+    
+    # def l1(x):
+    #     try:
+    #         return upper_func(x)
+    #     except:
+    #         return None
+    # def l2(x):
+    #     try:
+    #         return lower_func(x)
+    #     except:
+    #         return None
+    # def l3(x):
+    #     try:
+    #         return lower_func(x)-upper_func(x)
+    #     except:
+    #         return None
     
     # Create mesh
-    r = range(int(a/step),int((b)/step)+1)
-    r = [ x for x in r if l3(x*step) is not None and l3(x*step)<=0]
+    # r = range(int(a/step),int((b)/step)+1)
+    # r = [ x for x in r if l3(x*step) is not None and l3(x*step)<=0]
     
-    verts = [ (0,x*step,l1(x*step)) for x in r]
-    verts += [ (0,x*step,l2(x*step)) for x in r]
+    # verts = [ (0,x*step,l1(x*step)) for x in r]
+    # verts += [ (0,x*step,l2(x*step)) for x in r]
     
-    if not debug:
-        verts += [ (abs(l3(x*step)*height_scale),x*step,l1(x*step)) for x in r]
-        verts += [ (abs(l3(x*step)*height_scale),x*step,l2(x*step)) for x in r]
+    # if not debug:
+    #     verts += [ (abs(l3(x*step)*height_scale),x*step,l1(x*step)) for x in r]
+    #     verts += [ (abs(l3(x*step)*height_scale),x*step,l2(x*step)) for x in r]
+    
+    y1,y2,xvalues = discrete_points_generator(lower_func,upper_func,start=a,end=b,interval=step,mirror_axis=False) # NEW
+    r = xvalues # NEW
+    all_points = list(zip(xvalues,y1,y2))  # NEW
+    verts = [ (0,x,top) for x,bottom,top in all_points ] + [ (0,x,bottom) for x,bottom,top in all_points ]
+    verts += [ (top-bottom,x,top) for x,bottom,top in all_points ] + [ (top-bottom,x,bottom) for x,bottom,top in all_points ]
+
     edges,faces = [],[]
     l = len(r)
     if wireframe and not debug: 
@@ -105,7 +150,7 @@ def cross_square(lower_limit,upper_limit,precision,lower_func,upper_func,height_
         #faces += [ (x+0*l,x+1+0*l,x+1+2*l,x+2*l) for x in range(l-1) ]
         #faces += [ (x+0*l,x+1+0*l,x+1+2*l,x+2*l) for x in range(l-1) ]
         
-        faces += [ [l-1,l-1+1*l,l-1+3*l,l-1+2*l][::-1] ]
+        faces += [ [l-1,l-1+1*l,l-1+3*l,l-1+2*l][::1] ]
         faces += [ [0,1*l,3*l,2*l][::-1] ]
     if invert:
         faces = [ list(t)[::-1] for t in faces]
@@ -114,30 +159,37 @@ def cross_square(lower_limit,upper_limit,precision,lower_func,upper_func,height_
 def cross_triangle(lower_limit,upper_limit,precision,lower_func,upper_func,wireframe=False,debug=False,invert=False):
     a,b = lower_limit,upper_limit
     step = precision
-    def l1(x):
-        try:
-            return upper_func(x)
-        except:
-            return None
-    def l2(x):
-        try:
-            return lower_func(x)
-        except:
-            return None
-    def l3(x):
-        try:
-            return upper_func(x)-lower_func(x)
-        except:
-            return 0
+    # def l1(x):
+    #     try:
+    #         return upper_func(x)
+    #     except:
+    #         return None
+    # def l2(x):
+    #     try:
+    #         return lower_func(x)
+    #     except:
+    #         return None
+    # def l3(x):
+    #     try:
+    #         return upper_func(x)-lower_func(x)
+    #     except:
+    #         return 0
     
     # Create mesh
-    r = range(int(a/step),int((b)/step)+1)
-    r = [ x for x in r if l1(x*step) is not None and l2(x*step) is not None and l1(x*step)>=l2(x*step) ]
+    # r = range(int(a/step),int((b)/step)+1)
+    # r = [ x for x in r if l1(x*step) is not None and l2(x*step) is not None and l1(x*step)>=l2(x*step) ]
     
-    verts = [ (0,x*step,l1(x*step)) for x in r]
-    verts += [ (0,x*step,l2(x*step)) for x in r]
-    if not debug:
-        verts += [ (abs(l3(x*step)*math.sqrt(3)/2),x*step,l3(x*step)/2+l2(x*step)) for x in r]
+    # verts = [ (0,x*step,l1(x*step)) for x in r]
+    # verts += [ (0,x*step,l2(x*step)) for x in r]
+    # if not debug:
+    #     verts += [ (abs(l3(x*step)*math.sqrt(3)/2),x*step,l3(x*step)/2+l2(x*step)) for x in r]
+
+    y1,y2,xvalues = discrete_points_generator(lower_func,upper_func,start=a,end=b,interval=step,mirror_axis=False) # NEW
+    r = xvalues # NEW
+    all_points = list(zip(xvalues,y1,y2))  # NEW
+    verts = [ (0,x,top) for x,bottom,top in all_points ] + [ (0,x,bottom) for x,bottom,top in all_points ]
+    verts += [ (abs(top-bottom)*math.sqrt(3)/2,x,(top-bottom)/2+bottom) for x,bottom,top in all_points ]
+
     edges,faces = [],[]
     l = len(r)
     if wireframe and not debug: 
@@ -148,35 +200,44 @@ def cross_triangle(lower_limit,upper_limit,precision,lower_func,upper_func,wiref
             faces += [ (x+v*l,x+1+v*l,x+1+w*l,x+w*l) for x in range(int(l-1)) ]
         
         faces += [ (l-1,l-1+1*l,l-1+2*l) ]
-        faces += [ (0,1*l,2*l) ]
+        faces += [ (1*l,0,2*l) ]
     if invert:
         faces = [ list(t)[::-1] for t in faces]
     return verts,edges,faces
 
 def solid_revolution(lower_limit,upper_limit,precision,offset,lower_func,upper_func,wireframe=False,pie=False, debug=False,x_axis=False,invert=False):
-    def f(x):
-        try:
-            return lower_func(x)-offset
-        except:
-            return 0
-    def g(x):
-        try:
-            return upper_func(x)-offset
-        except:
-            return 0
-    def axis(x):
-        return offset
+    invert = not invert
+    # def f(x):
+    #     try:
+    #         return lower_func(x)-offset
+    #     except:
+    #         return 0
+    # def g(x):
+    #     try:
+    #         return upper_func(x)-offset
+    #     except:
+    #         return 0
+    # def axis(x):
+    #     return offset
 
     a,b,step = lower_limit,upper_limit,precision
-    r = range(int(a/step),int((b)/step)+1)
-    r = [ x for x in r if f(x*step) is not None and g(x*step) is not None and f(x*step)<=g(x*step) ]
-    verts,altverts,faces = [],[],[]
 
-    verts = [ (0,x*step,f(x*step)) for x in r ] + [ (0,x*step,g(x*step)) for x in r ]
-    altverts = [ (0,x*step,f(x*step)) for x in r ] + [ (0,x*step,g(x*step)) for x in r ]
+    # r = range(int(a/step),int((b)/step)+1)
+    # r = [ x for x in r if f(x*step) is not None and g(x*step) is not None and f(x*step)<=g(x*step) ]
+    # verts,altverts,faces = [],[],[]
+
+    # verts = [ (0,x*step,f(x*step)) for x in r ] + [ (0,x*step,g(x*step)) for x in r ]
+    # altverts = [ (0,x*step,f(x*step)) for x in r ] + [ (0,x*step,g(x*step)) for x in r ]
+
+    y1,y2,xvalues = discrete_points_generator(lower_func,upper_func,start=a,end=b,interval=step,mirror_axis=True) # NEW
+    r = xvalues # NEW
+    verts = list(zip(xvalues,y2))+list(zip(xvalues,y1))  # NEW
+    altverts = list(zip(xvalues,y2))+list(zip(xvalues,y1))
+    verts = [ (0,x,y) for x,y in verts]
+    altverts = [ (0,x,y) for x,y in altverts]
+
     if len(verts)<=0:
         raise ValueError("solid not possible. try switching top and bottom functions")
-
     l = int(len(verts)/2)
 
     # Existing Lines' vertices have been formed, now generate revolution vertices:
@@ -196,8 +257,12 @@ def solid_revolution(lower_limit,upper_limit,precision,offset,lower_func,upper_f
 
     # Generate extra faces for the ends in case of "pie"
     if pie:
-        faces.append([ x for x in range(l) ][::-1]+[ x+l for x in range(l)[::1] ])
-        faces.append([ x+(row_num-1)*l for x in range(l) ][::-1]+[ x+(row_num-2)*l for x in range(l)[::1] ])
+        pass
+        # faces.append([ x for x in range(l) ][::-1]+[ x+l for x in range(l)[::1] ])
+        # faces.append([ x+(row_num-1)*l for x in range(l) ][::-1]+[ x+(row_num-2)*l for x in range(l)[::1] ])
+        faces += [ (x+l,x+1+l,x+1,x) for x in range(l-1) ]
+        middle = (row_num-2)*l
+        faces += [ (x+l+middle,x+1+l+middle,x+1+middle,x+middle)[::-1] for x in range(l-1) ]
 
     if invert:
         faces = [ list(t)[::-1] for t in faces]

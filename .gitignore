@@ -3,3 +3,11 @@ dist
 *.py[cod]
 build
 generated_solid*
+plotted_solid.html
+sample.stl
+scratch_test.py
+scratch_work.txt
+test1.txt
+test2.txt
+test_set.html
+testres.txt

@@ -10,7 +10,7 @@ setup(
     },
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
     install_requires=[
-        'Flask','numpy-stl','enum34','python-utils','numpy'
+        'Flask','numpy-stl','enum34','python-utils','numpy','sympy','pyparsing'
     ],
     long_description=open('README.md').read(),
     

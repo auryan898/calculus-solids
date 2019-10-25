@@ -30,7 +30,7 @@ def install_prompt(text,package,default_install=False):
 
 
 def install(package):
-    return subprocess.call([sys.executable, "-m", "pip", "install"]+package.split()) == 0
+    return subprocess.call([sys.executable, "-m", "pip", "install","--user"]+package.split()) == 0
 
 
 if __name__=='__main__':

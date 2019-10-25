@@ -6,10 +6,10 @@ parser.add_argument('solid', help='''choose the solid to produce:
 REVOLUTION - for a solid of revolution
 CROSS_SQUARE - for a solid with square/rectangular cross sections
 CROSS_TRIANGLE - for a solid with triangular cross sections
-CROSS_SEMICIRCLE - for a solid with semi circle cross sections''',required=True)
+CROSS_SEMICIRCLE - for a solid with semi circle cross sections''')
 
-parser.add_argument('function1','--function1',type=str,help='the upper function to graph')
-parser.add_argument('function2','--function2',type=str,help='the lower function to graph')
+parser.add_argument('-f1','--function1',type=str,help='the upper function to graph')
+parser.add_argument('-f2','--function2',type=str,help='the lower function to graph')
 
 parser.add_argument('-l','--lower',type=float,help='the lower limit of the integral',required=True)
 parser.add_argument('-u','--upper',type=float,help='the upper limit of the integral',required=True)

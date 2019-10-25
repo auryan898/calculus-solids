@@ -31,9 +31,14 @@ def create():
     p_list = ["lower_limit","upper_limit","precision","wireframe","debug","invert"]
     if stype=='solid_revolution': 
         p_list.append('offset')
+        p_list.append('pie')
+    print request.args.items()
     params = ({k: eval(v) for k, v in request.args.items() if k in p_list})
 
-    params.update({ k: eval( "lambda x : {}".format(v) ) for k, v in request.args.items() if k in ["lower_func","upper_func"] })
+    params.update({ k: v for k, v in request.args.items() if k in ["lower_func","upper_func"] })
+
+    if stype=='solid_revolution':
+        params['offset'] = 0
     # extra options
     if 'wireframe' in request.args.getlist("extra_options"):
         params.update({'wireframe':True})
@@ -41,6 +46,8 @@ def create():
         params.update({'debug':True})
     if 'invert' in request.args.getlist("extra_options"):
         params.update({'invert':True})
+    if stype=='solid_revolution' and 'pie' in request.args.getlist("extra_options"):
+        params.update({'pie':True})
 
     print("Calculating Vertices and Faces...")
     data = None
@@ -59,24 +66,25 @@ def create():
         title = 'Solid with Square Cross Sections'
     v,e,f = data
     print(title)
+    # print(v,e,f)
     print("Generating Files...")
     name =  request.args.get('filename')
-    name = name if name else 'generated_solid'
+    name = name if name else 'generated_solid' # Filename decision
 
     # Generating Files
     context = []
     print(request.args.getlist("formats"))
     isSTL = False
     if 'stl' in request.args.getlist("formats"):
-        context.append(('STL format',mesh_stl(v,f,name=name), 'Download this file and it can be opened in any 3D modelling software' ))
+        context.append(('STL format','/uploads/'+mesh_stl(v,f,name=name), 'Download this file and it can be opened in any 3D modelling software' ))
         isSTL=True
     if 'plot' in request.args.getlist("formats"):
-        context.append(('3D Graphed Points',mesh_plotly(v,name=name,title=title,altverts=e), 'Click this link to open a 3D graph of the vertices of the solid' ))
+        context.append(('3D Graphed Points','/uploads/'+mesh_plotly(v,name=name,title=title,altverts=e), 'Click this link to open a 3D graph of the vertices of the solid' ))
     if 'jscad' in request.args.getlist("formats"):
-        context.append(('OpenJsCAD',mesh_openjscad(v,f,name=name), 'Download this file and go to openjscad.org.  Drag the downloaded file to the website and click "autoreload" to get an automatically updating display of the solid' ))
+        context.append(('OpenJsCAD','/uploads/'+mesh_openjscad(v,f,name=name), 'Download this file and go to openjscad.org.  Drag the downloaded file to the website and click "autoreload" to get an automatically updating display of the solid' ))
     if 'scad' in request.args.getlist("formats"):
-        context.append(('OpenSCAD',mesh_openscad(v,f,name=name), 'Download this file and you can open it in OpenSCAD' ))
-    return render_template('results.html',filenames=context,os=os,isSTLformat=isSTL)
+        context.append(('OpenSCAD','/uploads/'+mesh_openscad(v,f,name=name), 'Download this file and you can open it in OpenSCAD' ))
+    return render_template('results.html',filenames=context,os=os,isSTLformat=isSTL,the_filename="/uploads/"+name)
 
 @app.route("/create/revolution/",methods=["GET"])
 def revolution():
@@ -90,7 +98,7 @@ def cross_section():
     solid = solid_revolution(**params)
     return str(solid)
 
-# http://localhost:5000/create/revolution/?lower_limit=-3.0&upper_limit=3.0&precision=0.1&offset=0&lower_func=lambda x: 0&
+# http://localhost:5000/create/revolution/?lower_limit=-3.0&upper_limit=3.0&precision=0.1&offset=0&lower_func=0&
 
 def debug():
     # run flask app
