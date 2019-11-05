@@ -42,7 +42,7 @@ def BNF():
     # num = Regex(r"[+-]?\d+(:?\.\d*)?(:?[eE][+-]?\d+)?")
     # num = Word(nums)
     # ident = Word(alphas)
-    ident = oneOf('factorial sin cos tan asin acos atan sinh cosh tanh asinh acosh atanh') | oneOf('exp exp ln log ceil floor exp int abs')
+    ident = oneOf('factorial sin cos tan asin acos atan sinh cosh tanh asinh acosh atanh') | oneOf('exp exp ln log ceil floor exp int abs sqrt')
     
     plus = Literal('+')
     minus = Literal('-')
@@ -83,26 +83,28 @@ def solve_functions(func1,func2,start=None,end=None,mirror_axis=False):
     parser = BNF()
     x = sympy.Symbol('x')
     try:
-        expr1 = parser.parseString(func1)
+        expr1 = parser.parseString(func1) # String parsing error
+        expr1 = sympy.sympify(parser.transformString(func1)) # string to equation error
     except Exception as e:
-        return None, e
+        return e, func1, 'Could not parse first function'
     try:
-        expr2 = parser.parseString(func2)
+        expr2 = parser.parseString(func2) # String parsing error
+        expr2 = sympy.sympify(parser.transformString(func2)) # string to equation error
     except Exception as e:
-        return None, e
-    expr1 = sympy.sympify(parser.transformString(func1))
-    expr2 = sympy.sympify(parser.transformString(func2))
-    if all( [ isinstance(item,numbers.Number) for item in [start,end]] ):
-        start = min(float(start),float(end))
-        end = max(float(start),float(end))
-        set_dom = Interval(start,end)
-        eq = sympy.Eq(expr1,expr2)
-        solv = sympy.solveset(eq,x,domain=set_dom)
-    else:
-        eq = sympy.Eq(expr1,expr2)
-        solv = sympy.solveset(eq,x,domain=sympy.S.Reals)
-    try:
-        if not isinstance(solv,sympy.FiniteSet):
+        return e, func2, 'Could not parse second function'
+
+    try:  # solving error, for points between the two equations, only for added accuracy
+        if all( [ isinstance(item,numbers.Number) for item in [start,end]] ):
+            start = min(float(start),float(end))
+            end = max(float(start),float(end))
+            set_dom = Interval(start,end)
+            eq = sympy.Eq(expr1,expr2)
+            solv = sympy.solveset(eq,x,domain=set_dom)
+        else:
+            eq = sympy.Eq(expr1,expr2)
+            solv = sympy.solveset(eq,x,domain=sympy.S.Reals)
+
+        if not isinstance(solv,sympy.FiniteSet): # 
             meta = None
 
         else:
@@ -114,11 +116,13 @@ def solve_functions(func1,func2,start=None,end=None,mirror_axis=False):
         meta = None
     
     
-    # print expr1,expr2
-    expr1 = sympy.lambdify(x,expr1,'math')
-    expr2 = sympy.lambdify(x,expr2,'math')
-    result = lambda t : (max(expr1(t),expr2(t)), min(expr1(t),expr2(t))) # all bottom values
-    
+    try: # lambdifying equations
+        expr1 = sympy.lambdify(x,expr1,'math') # equation to lambda error
+        expr2 = sympy.lambdify(x,expr2,'math') # equation to lambda error
+        result = lambda t : (max(expr1(t),expr2(t)), min(expr1(t),expr2(t))) # all bottom values
+    except Exception as e:
+        return e, expr1, expr2, 'Could not lambdify sympy equations'
+
     def mirrored(x):
         y1 = expr1(x)
         y2 = expr2(x)
@@ -143,8 +147,11 @@ def discrete_points_generator(func1,func2,start,end,interval=0.1,mirror_axis=Fal
     end = float(max(start,end))
     interval = float(interval)
     x = sympy.Symbol('x')
-    expr,solved_points = solve_functions(func1,func2,start,end,mirror_axis)
-
+    solv = solve_functions(func1,func2,start,end,mirror_axis)
+    if isinstance(solv[0],Exception):
+        raise Exception(solv)
+    else:
+        expr,solved_points = solv[0], solv[1]
     r1 = []
     r2 = []
     xvalues = [ i*interval for i in range(int(start/interval),int(end/interval)+1)]

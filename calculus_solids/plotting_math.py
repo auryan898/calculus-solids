@@ -1,5 +1,6 @@
 import math
 import pkgutil
+import io
 
 import numpy as np
 from stl import mesh
@@ -269,7 +270,7 @@ def solid_revolution(lower_limit,upper_limit,precision,offset,lower_func,upper_f
 
     return verts,altverts,faces
 
-def mesh_stl(verts,faces,name="new_mesh"):
+def mesh_stl(verts,faces,name="new_mesh",buffer=False):
     
     verts = [list((round(x,2),round(y,2),round(z,2))) for x,y,z in verts ]
     faces0 = [ [t[0], t[i], t[i+1]][::-1] for t in faces for i in range(1,len(t)-1)]
@@ -286,25 +287,37 @@ def mesh_stl(verts,faces,name="new_mesh"):
             cube.vectors[i][j] = vertices[f[j],:]
 
     # Write the mesh to file "cube.stl"
-    cube.save(name+'.stl')
-    return name+'.stl'
+    if buffer:
+        b = io.BytesIO()
+        cube._write_ascii(b,name+'.stl')
+        b.seek(0)
+        return b
+    else:
+        cube.save(name+'.stl')
+        return name+'.stl'
 
-def mesh_openscad(verts,faces,name="new_mesh"):
+def mesh_openscad(verts,faces,name="new_mesh",buffer=False):
     
     verts = [list((round(x,2),round(y,2),round(z,2))) for x,y,z in verts ]
     faces = [list((t[0], t[i], t[i+1])) for t in faces for i in range(1,len(t)-1)]
+    text = "polyhedron(points=%s,faces=%s);" % (str(verts),str(faces))
     
-    with open(name+".scad","w") as f:
-        text = "polyhedron(points=%s,faces=%s);" % (str(verts),str(faces))
-        f.write(text)
-    return name+".scad"
+    if buffer:
+        f_io = io.StringIO()
+        f_io.write(text.decode('utf-8'))
+        f_io.seek(0)
+        return f_io
+    else:
+        with open(name+".scad","w") as f:
+            f.write(text)
+        return name+".scad"
 
-def mesh_openjscad(verts,faces,name="new_mesh"):
+def mesh_openjscad(verts,faces,name="new_mesh",buffer=False):
     verts = [list((round(x,2),round(y,2),round(z,2))) for x,y,z in verts ]
     faces = [list((t[0], t[i], t[i+1])) for t in faces for i in range(1,len(t)-1)]
     # faces = [list(t) for t in faces]
-    with open(name+".jscad","w") as f:
-        text = """
+    
+    text = """
 // title      : Calculus Solids
 // author     : Ryan B. Au
 // license    : MIT License
@@ -320,11 +333,19 @@ function create_solid(){
     let faces = %s;
     return polyhedron({points:verts,triangles:faces});
 }
-        """ % (str(verts),str(faces))
+    """ % (str(verts),str(faces))
+    if buffer:
+        f_io = io.StringIO()
+        f_io.write(text.decode('utf-8'))
+        f_io.seek(0)
+        return f_io
+    else:
+        f = open(name+".jscad","w")
         f.write(text)
-    return name+".jscad"
+        f.close()
+        return name+".jscad"
 
-def mesh_plotly(verts,name="new_mesh",title="New Mesh",altverts=None):
+def mesh_plotly(verts,name="new_mesh",title="New Mesh",altverts=None,buffer=False):
     # import plotly.offline as py
     # import plotly.graph_objs as go
     verts = [list((round(x,2),round(y,2),round(z,2))) for x,y,z in verts ]
@@ -348,9 +369,15 @@ def mesh_plotly(verts,name="new_mesh",title="New Mesh",altverts=None):
     src = src.replace('{{y}}',str(list(y)))
     src = src.replace('{{z}}',str(list(z)))
     src = src.replace('{{title}}',str(title))
-    with open(name+'.html','w') as f:
-        f.write(src)
-    return name+'.html'
+    if buffer:
+        f_io = io.StringIO()
+        f_io.write(src.decode('utf-8'))
+        f_io.seek(0)
+        return f_io
+    else:
+        with open(name+'.html','w') as f:
+            f.write(src)
+        return name+'.html'
 
 if __name__=='__main__':
     # import subprocess
