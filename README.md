@@ -10,7 +10,9 @@ The two main formats include either an STL 3D model, or a 3D coordinate plot of 
 
 ### Quick Start
 
-See our live demo at [repl.it](https://calculus-solids2--ryanau.repl.co/). It works, but it's not meant to be hosted online, so it's buggy.
+1. See our [live demo on repl.it](https://calculus-solids2--ryanau.repl.co/). It wasn't originally intended to be hosted online, but with some recent modifications, it works quite well. It is very useful now and a local installation is now the more difficult option due to having an installation procedure.
+
+2. This program can be installed and run on your computer. It opens up a simple server and uses your browser as an interface to its functionality.  A local installation should be able to work offline, but it's not guaranteed because it hasn't been tested this way yet.
 
 ### Installation
 
@@ -18,17 +20,13 @@ Best results in Python 2.7/2.6
 
 Python 3 was giving weird bugs I didn't bother to address.
 
-This tool is meant to be installed and run on your computer. It opens up a simple server and uses your browser as an interface to its functionality.
-
 **To Install:**  
-It isn't super easy, but perform 
-`pip install https://github.com/auryan898/calculus-solids/archive/master.zip`
+It isn't super easy, but in a cmd Command line or unix/bash shell   
+`pip install --user https://github.com/auryan898/calculus-solids/archive/master.zip`
 
 Then run in a script:
 
     from calculus_solids import web
     web.start()
 
-And a browser window should open up for your local version of the application. (Note: files are generated in directory where this code is executed.)
-
-Will eventually simplify the process.
+And a browser window should open up for your local version of the application. (Note: files are no longer generated in the directory where this code is executed.  Do not worry about this if you have no clue what it means.)
