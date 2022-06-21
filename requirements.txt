@@ -15,7 +15,7 @@ jsonschema==3.0.1
 jupyter-core==4.4.0
 markupsafe==1.1.1
 nbformat==4.4.0
-numpy==1.16.4
+numpy==1.22.0
 numpy-stl==2.10.1
 pyrsistent==0.15.2
 python-utils==2.3.0
