@@ -10,7 +10,7 @@ The two main formats include either an STL 3D model, or a 3D coordinate plot of 
 
 ### Quick Start
 
-1. See our [live demo on repl.it](https://calculus-solids2--ryanau.repl.co/). It wasn't originally intended to be hosted online, but with some recent modifications, it works quite well. It is very useful now and a local installation is now the more difficult option due to having an installation procedure.
+1. See the [live demo on repl.it](https://calculus-solids2--ryanau.repl.co/). It wasn't originally intended to be hosted online, but with some recent modifications, it works quite well. It is very useful now and a local installation is now the more difficult option due to having an installation procedure.
 
 2. This program can be installed and run on your computer. It opens up a simple server and uses your browser as an interface to its functionality.  A local installation should be able to work offline, but it's not guaranteed because it hasn't been tested this way yet.
 
